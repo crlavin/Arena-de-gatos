@@ -1,0 +1,28 @@
+@media (max-width: 768px) {
+    /* Ajustes para dispositivos con un ancho máximo de 768px */
+  
+    .products {
+      display: flex;
+      height: auto;
+      max-height: none;
+    }
+  
+    .product {
+      margin-top: auto;
+    }
+  
+    .main_section {
+      padding: 4%;
+    }
+  
+    .beneficios,
+    .menciones {
+      display: flex;
+    }
+  
+    nav {
+      justify-content: center;
+      padding: 20px;
+    }
+  }
+  
