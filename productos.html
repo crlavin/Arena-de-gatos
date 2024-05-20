@@ -10,7 +10,10 @@
     <link rel="stylesheet" type="text/css" href="css/mobile.css">
     <link rel="stylesheet" type="text/css" href="css/animation.css">
     <link rel="stylesheet" type="text/html" href="productos.html">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="js/app.js" async></script>
 </head>
 
 <body>
@@ -23,64 +26,143 @@
         <div class="nav_options">
             <ul>
                 <li><a href="index.html">INICIO</a></li>
+                <li><a href="productos.html">PRODUCTOS</a></li>
                 <li><a href="nosotros.html">NUESTRA EMPRESA</a></li>
                 <li><a href="politica_priv.html">POLITICA DE PRIVACIDAD</a></li>
-                <li><a href="politica_priv.html">TERMINOS Y CONDICIONES</a></li>
-                <li><a href="productos.html">PRODUCTOS</a></li>
-                <li><a href="carrito.html">&#128722;CARRITO DE COMPRAS</a></li>
+                <li><a href="terminos_condiciones.html">TERMINOS Y CONDICIONES</a></li>
             </ul>
         </div>
     </nav>
     <!-- Aqui acaba Nav Bar -->
 
-    <!-- Aqui termina la seccion de ventajas -->
-
-    <div class="granproducts">
-        <div class="products fadeInUp">
-
-            <div class="product">
-                <div class="content">
-                    <div class="img_content">
-                        <img src="img/Arena para gatos Aglomerante.jpg" alt="" width="250px>
-          </div>
-          <div class=" topprod_text">
-                        <h2>Arena Aglomerante 20kg</h2>
-                        <p class="topprod_precio">$19.990</p>
-                    </div>
-                    <a href="venta1.html" class="main_button">COMPRAR</a>
-                </div>
+    <section class="contenedor">
+        <!-- Contenedor de elementos -->
+        <div class="contenedor-items">
+            <div class="item">
+                <span class="titulo-item">Arena Aglomerante 20kg</span>
+                <img src="img/Arena para gatos Aglomerante.jpg" alt="" class="img-item">
+                <span class="precio-item">$19.990</span>
+                <button class="boton-item">Agregar al Carrito</button>
             </div>
-
-
-            <div class="product">
-                <div class="content">
-                    <div class="img_content">
-                        <img src="img/arena sanitaria lavanda.png" alt="" width="250px>
-          </div>
-          <div class=" topprod_text">
-                        <h2>Arena Sanitaria Lavanda 8kg</h2>
-                        <p class="topprod_precio">$7.990</p>
-                    </div>
-                    <a href="venta2.html" class="main_button">COMPRAR</a>
-                </div>
+            <div class="item">
+                <span class="titulo-item">Arena Sanitaria Lavanda 8kg</span>
+                <img src="img/arena sanitaria lavanda.png" alt="" class="img-item">
+                <span class="precio-item">$7.990</span>
+                <button class="boton-item">Agregar al Carrito</button>
             </div>
-
-            <div class="product">
-                <div class="content">
-                    <div class="img_content">
-                        <img src="img/arena mineral.jpeg" alt="" width="250px>
-          </div>
-          <div class=" topprod_text">
-                        <h2>Arena Mineral 4kg</h2>
-                        <p class="topprod_precio">$4.990</p>
-                    </div>
-                    <a href="venta3.html" class="main_button">COMPRAR</a>
-                </div>
+            <div class="item">
+                <span class="titulo-item">Arena Mineral 4kg</span>
+                <img src="img/arena mineral.jpeg" alt="" class="img-item">
+                <span class="precio-item">$4.990</span>
+                <button class="boton-item">Agregar al Carrito</button>
+            </div>
+            <div class="item">
+                <span class="titulo-item">Arena Vegetal 2kg</span>
+                <img src="img/arena vegetal.jpeg" alt="" class="img-item">
+                <span class="precio-item">$2.990</span>
+                <button class="boton-item">Agregar al Carrito</button>
+            </div>
+            <div class="item">
+                <span class="titulo-item">Arena Sanitaria Safari 20kg</span>
+                <img src="img/Arena-Safari.jpg" alt="" class="img-item">
+                <span class="precio-item">$16.990</span>
+                <button class="boton-item">Agregar al Carrito</button>
+            </div>
+            <div class="item">
+                <span class="titulo-item">Arena Sanitaria Binder 8kg</span>
+                <img src="img/binder-sand.jpeg" alt="" class="img-item">
+                <span class="precio-item">$6.990</span>
+                <button class="boton-item">Agregar al Carrito</button>
+            </div>
+            <div class="item">
+                <span class="titulo-item">Arena Sanitaria HappyCat 18kg</span>
+                <img src="img/happy-cat-arena-sanitaria.jpg" alt="" class="img-item">
+                <span class="precio-item">$18.990</span>
+                <button class="boton-item">Agregar al Carrito</button>
+            </div>
+            <div class="item">
+                <span class="titulo-item">Arena Sanitaria AmericaLitter 15kg</span>
+                <img src="img/america-litter-ultra-odor-seal-baby-powder.jpg" alt="" class="img-item">
+                <span class="precio-item">$22.990</span>
+                <button class="boton-item">Agregar al Carrito</button>
             </div>
         </div>
-        
-    </div>
+        <!-- Carrito de Compras -->
+        <div class="carrito" id="carrito">
+            <div class="header-carrito">
+                <h2>Tu Carrito</h2>
+            </div>
 
+            <div class="carrito-items">
+                <!-- 
+                <div class="carrito-item">
+                    <img src="img/boxengasse.png" width="80px" alt="">
+                    <div class="carrito-item-detalles">
+                        <span class="carrito-item-titulo">Box Engasse</span>
+                        <div class="selector-cantidad">
+                            <i class="fa-solid fa-minus restar-cantidad"></i>
+                            <input type="text" value="1" class="carrito-item-cantidad" disabled>
+                            <i class="fa-solid fa-plus sumar-cantidad"></i>
+                        </div>
+                        <span class="carrito-item-precio">$15.000,00</span>
+                    </div>
+                   <span class="btn-eliminar">
+                        <i class="fa-solid fa-trash"></i>
+                   </span>
+                </div>
+                <div class="carrito-item">
+                    <img src="img/skinglam.png" width="80px" alt="">
+                    <div class="carrito-item-detalles">
+                        <span class="carrito-item-titulo">Skin Glam</span>
+                        <div class="selector-cantidad">
+                            <i class="fa-solid fa-minus restar-cantidad"></i>
+                            <input type="text" value="3" class="carrito-item-cantidad" disabled>
+                            <i class="fa-solid fa-plus sumar-cantidad"></i>
+                        </div>
+                        <span class="carrito-item-precio">$18.000,00</span>
+                    </div>
+                   <button class="btn-eliminar">
+                        <i class="fa-solid fa-trash"></i>
+                   </button>
+                </div>
+                 -->
+            </div>
+            <div class="carrito-total">
+                <div class="fila">
+                    <strong>Tu Total</strong>
+                    <span class="carrito-precio-total">
+                        $120.000,00
+                    </span>
+                </div>
+                <!-- Botón de Pagar -->
+                <button class="btn-pagar" onclick="crearTransaccion()">Pagar <i
+                        class="fa-solid fa-bag-shopping"></i></button>
+
+                <!-- Script para manejar el pago -->
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                    function crearTransaccion() {
+                        // Llamada AJAX para iniciar la transacción con Transbank
+                        $.ajax({
+                            url: 'crear_transaccion.php', // Cambia esta URL por la ruta a tu archivo PHP
+                            type: 'POST',
+                            data: {
+                                monto: 120000 // Reemplaza con el monto total de la compra
+                            },
+                            success: function (response) {
+                                // Redirige a la URL de Transbank
+                                window.location.href = response.url;
+                            },
+                            error: function () {
+                                alert('Hubo un error al procesar el pago.');
+                            }
+                        });
+                    }
+                </script>
+
+            </div>
+        </div>
+    </section>
     <!-- Termina seccion de top productos -->
     <!-- Inicio de footer -->
     <footer>
