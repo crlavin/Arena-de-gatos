@@ -1,7 +1,7 @@
 <?php
 include 'config.php'; // Incluir el archivo de configuración
 
-$sql = "SELECT id_producto, nombre, descripcion, precio, stock FROM Productos";
+$sql = "SELECT * FROM Productos";
 $result = $conn->query($sql);
 ?>
 
