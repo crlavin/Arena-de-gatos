@@ -177,7 +177,7 @@ $con = null;
                         </tbody>
                     </table>
                     <div style="text-align: right;">
-                        <button onclick="location.href='checkout.php'" class="realizar-pago-btn">Realizar Pago</button>
+                        <button class="realizar-pago-btn">Realizar Pago</button>
                     </div>
                 </div>
         </section>

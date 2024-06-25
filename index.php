@@ -52,7 +52,7 @@ $con = null;
         <li><a href="nosotros.php">NUESTRA EMPRESA</a></li>
         <li><a href="politica_priv.php">POLITICA DE PRIVACIDAD</a></li>
         <li><a href="terminos_condiciones.php">TERMINOS Y CONDICIONES</a></li>
-        <li><a href="checkout.php">CARRITO <span id="num_cart"><?php echo $num_cart; ?></span></a></li>
+        <li><a href="checkout.php"><i class="fas fa-shopping-cart"></i> CARRITO <span id="num_cart"><?php echo $num_cart; ?></span></a></li>
       </ul>
     </div>
   </nav>

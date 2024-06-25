@@ -7,7 +7,7 @@ if(isset($_SESSION['carrito']['productos'])){
     $num_cart = count($_SESSION['carrito']['productos']);
 
 }
-define("KEY_TOKEN", "ZXC.qwe-876**")
-
+define("KEY_TOKEN", "ZXC.qwe-876**");
+define("MONEDA", "$");
 
 ?>
