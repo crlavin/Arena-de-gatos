@@ -1,5 +1,6 @@
 <?php
 require 'config/database.php';
+require 'config/config.php';
 
 // Crear una instancia de la clase Database
 $db = new Database();
@@ -8,7 +9,7 @@ $db = new Database();
 $con = $db->conectar();
 
 // Preparar la consulta SQL
-$sql = $con->prepare("SELECT id_producto, nombre, precio FROM producto");
+$sql = $con->prepare("SELECT id, nombre, precio FROM producto");
 
 // Ejecutar la consulta
 $sql->execute();
@@ -35,7 +36,6 @@ $con = null;
   <link rel="stylesheet" type="text/css" href="css/animation.css">
   <link rel="stylesheet" type="text/html" href="productos.php">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <script src="js/app.js" async></script>
 </head>
 
 <body>
@@ -52,6 +52,7 @@ $con = null;
         <li><a href="nosotros.php">NUESTRA EMPRESA</a></li>
         <li><a href="politica_priv.php">POLITICA DE PRIVACIDAD</a></li>
         <li><a href="terminos_condiciones.php">TERMINOS Y CONDICIONES</a></li>
+        <li><a href="checkout.php">CARRITO <span id="num_cart"><?php echo $num_cart; ?></span></a></li>
       </ul>
     </div>
   </nav>
@@ -115,7 +116,7 @@ $con = null;
       <div class="product">
         <div class="content">
           <div class="img_content">
-            <img src="img/Arena para gatos Aglomerante.jpg" alt="" width="250px>
+            <img src="img/Arena-para-gatos-Aglomerante.jpg" width="250px">
           </div>
           <div class=" topprod_text">
             <h2>Arena Aglomerante 20kg</h2>
@@ -129,7 +130,7 @@ $con = null;
       <div class="product">
         <div class="content">
           <div class="img_content">
-            <img src="img/arena sanitaria lavanda.png" alt="" width="250px>
+            <img src="img/arena-sanitaria-lavanda.png" alt="" width="250px">
           </div>
           <div class=" topprod_text">
             <h2>Arena Sanitaria Lavanda 8kg</h2>
@@ -142,7 +143,7 @@ $con = null;
       <div class="product">
         <div class="content">
           <div class="img_content">
-            <img src="img/arena mineral.jpeg" alt="" width="250px>
+            <img src="img/arena-mineral.jpg" alt="" width="250px">
           </div>
           <div class=" topprod_text">
             <h2>Arena Mineral 4kg</h2>
@@ -153,7 +154,7 @@ $con = null;
       </div>
     </div>
 
-    <a href="productos.html" class="showmore_button">MAS PRODUCTOS</a>
+    <a href="productos.php" class="showmore_button">MAS PRODUCTOS</a>
   </div>
 
   <!-- Termina seccion de top productos -->
@@ -231,8 +232,8 @@ $con = null;
   <footer>
     <div class="option">
       <ul>
-        <li><a href="politica_priv.html">©2024 Company. Política de Privacidad</a></li>
-        <li><a href="terminos_condiciones.html">| Términos & Condiciones.</a></li>
+        <li><a href="politica_priv.php">©2024 Company. Política de Privacidad</a></li>
+        <li><a href="terminos_condiciones.php">| Términos & Condiciones.</a></li>
       </ul>
     </div>
     <div class="logos">

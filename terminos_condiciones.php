@@ -1,3 +1,7 @@
+<?php
+require 'config/database.php';
+require 'config/config.php';
+?>
 <!DOCTYPE html>
 <html lang="es" dir="ltr">
 
@@ -10,10 +14,7 @@
     <link rel="stylesheet" type="text/css" href="css/mobile.css">
     <link rel="stylesheet" type="text/css" href="css/animation.css">
     <link rel="stylesheet" type="text/html" href="productos.php">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
-        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="js/app.js" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
@@ -30,6 +31,7 @@
                 <li><a href="nosotros.php">NUESTRA EMPRESA</a></li>
                 <li><a href="politica_priv.php">POLITICA DE PRIVACIDAD</a></li>
                 <li><a href="terminos_condiciones.php">TERMINOS Y CONDICIONES</a></li>
+                <li><a href="checkout.php">CARRITO <span id="num_cart"><?php echo $num_cart; ?></span></a></li>
             </ul>
         </div>
     </nav>
@@ -121,8 +123,8 @@
     <footer>
         <div class="option">
             <ul>
-                <li><a href="politica_priv.html">©2024 Company. Política de Privacidad</a></li>
-                <li><a href="terminos_condiciones.html">| Términos & Condiciones.</a></li>
+                <li><a href="politica_priv.php">©2024 Company. Política de Privacidad</a></li>
+                <li><a href="terminos_condiciones.php">| Términos & Condiciones.</a></li>
             </ul>
         </div>
         <div class="logos">
