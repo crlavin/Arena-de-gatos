@@ -77,7 +77,7 @@ $con = null;
         h3#total_general {
             font-size: 24px;
             /* Tamaño de fuente más grande */
-            text-align: left;
+            text-align: center;
             /* Alineación a la derecha */
             margin-top: 10px;
             /* Espacio superior */
@@ -170,16 +170,19 @@ $con = null;
                             endif; ?>
                             <tr>
                                 <td colspan="3"></td>
-                                <td colspan="2">
+                                <td colspan="1">
                                     <h3 id="total_general" name="total_general[]"><?php echo MONEDA . number_format($total_general, 0, ',', '.'); ?> </h3>
                                 </td>
+                                <td colspan="1"></td>
                             </tr>
                         </tbody>
                     </table>
-                    <div style="text-align: right;">
-                        <button onclick="location.href='checkout.php'" class="realizar-pago-btn">Realizar Pago</button>
-                    </div>
+                    <?php if ($lista_carrito != null) { ?>
+                        <div style="text-align: right;">
+                            <button onclick="location.href='pago.php'" class="realizar-pago-btn">Realizar Pago</button>
+                        </div>
                 </div>
+            <?php } ?>
         </section>
     </main>
 

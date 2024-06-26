@@ -2,6 +2,9 @@
 require 'config/database.php';
 require 'config/config.php';
 
+// Tasa de conversión de CLP a USD
+$conversion_rate = 1 / 947.14;
+
 $db = new Database();
 $con = $db->conectar();
 
@@ -9,19 +12,28 @@ $producto = isset($_SESSION['carrito']['productos']) ? $_SESSION['carrito']['pro
 $lista_carrito = array();
 
 if ($producto != null) {
-    foreach ($producto as $clave => $cantidad) { // Corregido: $producto a $productos
+    foreach ($producto as $clave => $cantidad) {
         $sql = $con->prepare("SELECT id, nombre, img, precio, $cantidad as cantidad FROM producto WHERE id=?");
         $sql->execute([$clave]);
-        $producto = $sql->fetch(PDO::FETCH_ASSOC); // Cambiado a $producto
+        $producto = $sql->fetch(PDO::FETCH_ASSOC);
 
-        // Agregamos cantidad al array $producto obtenido de la base de datos
         if ($producto) {
-            $producto['cantidad'] = $cantidad; // Agrega la cantidad al producto
-            $lista_carrito[] = $producto; // Añade el producto al carrito
+            $producto['cantidad'] = $cantidad;
+            $lista_carrito[] = $producto;
         }
     }
+} else {
+    header("Location: index.php");
+    exit;
 }
-$total_general = 0;
+
+$total_general_clp = 0;
+foreach ($lista_carrito as $producto) {
+    $total_general_clp += $producto['cantidad'] * $producto['precio'];
+}
+
+// Convertir total de CLP a USD
+$total_general_usd = $total_general_clp * $conversion_rate;
 $con = null;
 ?>
 <!DOCTYPE html>
@@ -40,14 +52,13 @@ $con = null;
     <style>
         .contenedor-items {
             margin-top: 20px;
-            /* Ajusta el margen superior según sea necesario */
         }
 
         table {
-            width: 100%;
+            width: 50%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            /* Espacio inferior entre la tabla y el botón */
+            float: right;
         }
 
         th,
@@ -76,12 +87,8 @@ $con = null;
 
         h3#total_general {
             font-size: 24px;
-            /* Tamaño de fuente más grande */
-            text-align: left;
-            /* Alineación a la derecha */
+            text-align: center;
             margin-top: 10px;
-            /* Espacio superior */
-
         }
 
         button.realizar-pago-btn {
@@ -103,11 +110,14 @@ $con = null;
             position: fixed;
             bottom: 0;
         }
+
+        #paypal-button-container {
+            float: left;
+        }
     </style>
 </head>
 
 <body>
-    <!-- Navigation Bar -->
     <header>
         <nav class="fadeIn">
             <div class="img_brand">
@@ -121,148 +131,114 @@ $con = null;
                     <li><a href="politica_priv.php">POLÍTICA DE PRIVACIDAD</a></li>
                     <li><a href="terminos_condiciones.php">TÉRMINOS Y CONDICIONES</a></li>
                     <li><a href="checkout.php"><i class="fas fa-shopping-cart"></i> CARRITO <span id="num_cart"><?php echo $num_cart; ?></span></a></li>
-
                 </ul>
             </div>
         </nav>
     </header>
 
-    <!-- Main Content -->
     <main>
         <section class="contenedor">
             <div class="contenedor-items">
                 <div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Precio</th>
-                                <th>Cantidad</th>
-                                <th>Total</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($lista_carrito)) : ?>
-                                <tr>
-                                    <td colspan="5"><b>Lista Vacía</b></td>
-                                </tr>
-                                <?php else :
-                                $total_general = 0;
-                                foreach ($lista_carrito as $producto) :
-                                    $_id = $producto['id'];
-                                    $nombre = $producto['nombre'];
-                                    $precio = $producto['precio'];
-                                    $cantidad = $producto['cantidad'];
-                                    $total = $cantidad * $precio;
-                                    $total_general += $total;
-                                ?>
+                    <div>
+                        <h1>Detalles de Pago</h1>
+                        <div id="paypal-button-container"></div>
+                    </div>
+                    <div>
+                        <div>
+                            <table>
+                                <thead>
                                     <tr>
-                                        <td><?php echo $nombre; ?></td>
-                                        <td><?php echo MONEDA . number_format($precio, 0, ',', '.'); ?></td>
-                                        <td>
-                                            <input type="number" min="1" max="99" step="1" value="<?php echo $cantidad; ?>" size="5" id="cantidad_<?php echo $_id; ?>" onchange="actualizaCantidad(this.value, <?php echo $_id; ?>)">
-                                        </td>
-                                        <td id="total_<?php echo $_id; ?>" name="total[]"><?php echo MONEDA . number_format($total, 0, ',', '.'); ?></td>
-                                        <td><button class="realizar-pago-btn" onclick="eliminarProducto(<?php echo $_id; ?>)">Eliminar</button></td>
+                                        <th>Producto</th>
+                                        <th>Total</th>
                                     </tr>
-                            <?php endforeach;
-                            endif; ?>
-                            <tr>
-                                <td colspan="3"></td>
-                                <td colspan="2">
-                                    <h3 id="total_general" name="total_general[]"><?php echo MONEDA . number_format($total_general, 0, ',', '.'); ?> </h3>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div style="text-align: right;">
-                        <button class="realizar-pago-btn">Realizar Pago</button>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($lista_carrito)) : ?>
+                                        <tr>
+                                            <td colspan="5"><b>Lista Vacía</b></td>
+                                        </tr>
+                                        <?php else :
+                                        foreach ($lista_carrito as $producto) :
+                                            $_id = $producto['id'];
+                                            $nombre = $producto['nombre'];
+                                            $precio = $producto['precio'];
+                                            $cantidad = $producto['cantidad'];
+                                            $total = $cantidad * $precio;
+                                        ?>
+                                            <tr>
+                                                <td><?php echo $nombre; ?></td>
+                                                <td id="total_<?php echo $_id; ?>" name="total[]"><?php echo MONEDA . number_format($total, 0, ',', '.'); ?></td>
+                                            </tr>
+                                    <?php endforeach;
+                                    endif; ?>
+                                    <tr>
+                                        <td colspan="1"></td>
+                                        <td colspan="1">
+                                            <h3 id="total_general" name="total_general[]"><?php echo MONEDA . number_format($total_general_clp, 0, ',', '.'); ?> </h3>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
         </section>
     </main>
-
+    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo CLIENT_ID; ?>" data-sdk-integration-source="button-factory"></script>
     <script>
-        function actualizaCantidad(cantidad, id) {
-            let url = 'actualizar_carrito.php';
-            let formData = new FormData();
-            formData.append('action', 'agregar');
-            formData.append('id', id);
-            formData.append('cantidad', cantidad);
+        function initPayPalButton() {
+            paypal.Buttons({
+                style: {
+                    shape: 'pill',
+                    color: 'gold',
+                    layout: 'vertical',
+                    label: 'pay',
+                },
 
-            fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'cors'
-                }).then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error('Network response was not ok: ' + text);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.ok) {
-                        let divtotal = document.getElementById("total_" + id);
-                        if (divtotal) {
-                            divtotal.innerHTML = data.sub;
-                        } else {
-                            console.error('Element with ID total_' + id + ' not found.');
-                        }
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            "amount": {
+                                "currency_code": "USD",
+                                "value": <?php echo number_format($total_general_usd, 2, '.', ''); ?>
+                            }
+                        }]
+                    });
+                },
 
-                        let total = 0;
-                        let list = document.getElementsByName("total[]");
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        console.log(details);
 
-                        for (let i = 0; i < list.length; i++) {
-                            total += parseFloat(list[i].innerHTML.replace(/[^\d]/g, ''));
-                        }
+                        let url = 'captura.php';
 
-                        total = new Intl.NumberFormat('es-CL', {
-                            style: 'currency',
-                            currency: 'CLP',
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0
-                        }).format(total);
+                        return fetch(url, {
+                            method: 'post',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                details: details
+                            })
+                        })
+                    });
+                },
 
-                        document.getElementById('total_general').innerHTML = total;
-                    }
-                }).catch(error => {
-                    console.error('Error:', error.message);
-                });
+                onCancel: function(data) {
+                    alert("Pago Cancelado");
+                    console.log(data);
+                },
+
+                onError: function(err) {
+                    console.error('Ocurrió un error durante el proceso de pago: ', err);
+                }
+
+            }).render('#paypal-button-container');
         }
-    </script>
-    <script>
-        function eliminarProducto(id) {
-            let url = 'eliminar_carrito.php';
-            let formData = new FormData();
-            formData.append('id', id);
-
-            fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'cors'
-                }).then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error('Network response was not ok: ' + text);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.ok) {
-                        location.reload(); // Recarga la página para actualizar el carrito
-                    }
-                }).catch(error => {
-                    console.error('Error:', error.message);
-                });
-        }
+        initPayPalButton();
     </script>
 
-
-    <!-- Footer -->
     <footer>
         <div class="option">
             <ul>
