@@ -1,6 +1,6 @@
 <?php
 require 'config/database.php';
-require 'config/config.php'
+require 'config/config.php';
 ?>
 <!DOCTYPE html>
 <html lang="es" dir="ltr">
@@ -87,7 +87,7 @@ require 'config/config.php'
                         throw new Exception('Error: Token no válido');
                     }
 
-                    $sql = $con->prepare("SELECT nombre, precio, descripcion, img FROM producto WHERE id = ? LIMIT 1");
+                    $sql = $con->prepare("SELECT nombre, precio, descripcion, img, stock FROM producto WHERE id = ? LIMIT 1");
                     $sql->execute([$id]);
                     $producto = $sql->fetch(PDO::FETCH_ASSOC);
 
@@ -100,15 +100,21 @@ require 'config/config.php'
                     $precio = $producto['precio'];
                     $precio_formateado = number_format($precio, 0, ',', '.');
                     $descripcion = $producto['descripcion'];
+                    $stock = $producto['stock'];
 
                     echo "<img src='$img' alt='Imagen de $nombre'>";
                     echo '<div>';
                     echo "<h1>$nombre</h1>";
                     echo "<h3>$descripcion</h3>";
                     echo "<h1 data-precio='$precio'>$ $precio_formateado</h1>";
-                    echo "<button class='boton-item' onclick=\"location.href='checkout.php?id=$id&token=$token'\">Comprar</button>";
+                    echo "<h3>Stock: $stock Unidades.</h3>";
+                    echo "<div class='col-3 my-3'>";
+                    echo "<h3>Cantidad: <input class='form-control' id='cantidad' name='cantidad' type='number' min='1' max='99' value='1'></h3>";
+                    echo "</div>";
                     echo "<br>";
-                    echo "<button onclick=\"addProducto($id, '$token')\">Agregar al Carrito</button>";
+                    echo "<button class='boton-item' onclick=\"location.href='checkout.php?id=$id&token=$token'\">Comprar ahora</button>";
+                    echo "<br>";
+                    echo "<button onclick=\"addProducto($id, document.getElementById('cantidad').value, '$token')\">Agregar al Carrito</button>";
                     echo '</div>';
 
                     $con = null;
@@ -122,10 +128,11 @@ require 'config/config.php'
         </section>
     </main>
     <script>
-        function addProducto(id, token) {
+        function addProducto(id, cantidad, token) {
             let url = 'carrito.php';
             let formData = new FormData();
             formData.append('id', id);
+            formData.append('cantidad', cantidad);
             formData.append('token', token);
 
             fetch(url, {

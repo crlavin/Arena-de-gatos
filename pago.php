@@ -221,6 +221,8 @@ $con = null;
                             body: JSON.stringify({
                                 details: details
                             })
+                        }).then(function(response){
+                            window.location.href = "completado.php?key=" + details['id'];
                         })
                     });
                 },

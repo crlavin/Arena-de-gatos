@@ -8,6 +8,7 @@ if ($con) {
     echo 'Conexión exitosa a la base de datos<br>';
 } else {
     echo 'Error en la conexión a la base de datos<br>';
+    exit;
 }
 
 $json = file_get_contents('php://input');
@@ -51,11 +52,12 @@ if (is_array($datos)) {
     }
 
     if (isset($id) && $id > 0) {
+        session_start(); // Asegúrate de que la sesión está iniciada
         $producto = isset($_SESSION['carrito']['productos']) ? $_SESSION['carrito']['productos'] : null;
 
         if ($producto != null) {
             foreach ($producto as $clave => $cantidad) {
-                $sql = $con->prepare("SELECT id, nombre, precio FROM producto WHERE id=?");
+                $sql = $con->prepare("SELECT id, nombre, precio, stock FROM producto WHERE id=?");
                 $sql->execute([$clave]);
                 $row_prod = $sql->fetch(PDO::FETCH_ASSOC);
 
@@ -63,12 +65,19 @@ if (is_array($datos)) {
                 $precio = $row_prod['precio'];
                 $cantidad = $cantidad;
 
+                // Insertar en detalle_compra
                 $sql_insert = $con->prepare("INSERT INTO detalle_compra (id_compra, id_producto, nombre, precio, cantidad) VALUES (?, ?, ?, ?, ?)");
                 $sql_insert->execute([$id, $clave, $row_prod['nombre'], $row_prod['precio'], $cantidad]);
+
+                // Actualizar el stock del producto
+                $sql_update = $con->prepare("UPDATE producto SET stock = stock - ? WHERE id = ?");
+                $sql_update->execute([$cantidad, $clave]);
             }
+            include 'enviar_email.php';
         }
         unset($_SESSION['carrito']);
     }
 } else {
     echo 'Error: Datos recibidos no son un array<br>';
 }
+?>
