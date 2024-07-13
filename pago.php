@@ -121,7 +121,7 @@ $con = null;
     <header>
         <nav class="fadeIn">
             <div class="img_brand">
-                <img src="img/logo2.png" alt="Logo de la tienda" width="150px">
+                <a href="index.php"><img src="img/logo2.png" alt="" width="150PX"></a>
             </div>
             <div class="nav_options">
                 <ul>
@@ -131,6 +131,11 @@ $con = null;
                     <li><a href="politica_priv.php">POLÍTICA DE PRIVACIDAD</a></li>
                     <li><a href="terminos_condiciones.php">TÉRMINOS Y CONDICIONES</a></li>
                     <li><a href="checkout.php"><i class="fas fa-shopping-cart"></i> CARRITO <span id="num_cart"><?php echo $num_cart; ?></span></a></li>
+                    <?php if (isset($_SESSION['user_name'])) { ?>
+                        <li><a href="#"><i class="fas fa-user"></i> <span id="user_name"><?php echo $_SESSION['user_name']; ?></span></a></li>
+                    <?php } else { ?>
+                        <li><a href="login.php"><i class="fas fa-user"></i> LOGIN</a></li>
+                    <?php } ?>
                 </ul>
             </div>
         </nav>
@@ -221,7 +226,7 @@ $con = null;
                             body: JSON.stringify({
                                 details: details
                             })
-                        }).then(function(response){
+                        }).then(function(response) {
                             window.location.href = "completado.php?key=" + details['id'];
                         })
                     });

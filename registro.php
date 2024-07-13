@@ -1,7 +1,9 @@
 <?php
+
 require 'config/database.php';
 require 'config/config.php';
 require 'clienteFunciones.php';
+
 
 $errors = [];
 
@@ -22,7 +24,7 @@ if (!empty($_POST)) {
         $errors[] = "Debe llenar todos los campos";
     }
 
-    if (!esEmail([$email])) {
+    if (esEmail([$email])) {
         $errors[] = "La dirección de correo no es válida";
     }
 
@@ -30,7 +32,7 @@ if (!empty($_POST)) {
         $errors[] = "Las contraseñas no coinciden";
     }
 
-    if (usuarioExiste($usuario, $con)) {
+    if (existeUsuario($usuario, $con)) {
         $errors[] = "El nombre del usuario $usuario ya existe";
     }
 
@@ -42,9 +44,28 @@ if (!empty($_POST)) {
 
         $id = registraCliente([$nombres, $apellidos, $email, $telefono, $dni], $con);
         if ($id > 0) {
-            $pass_hash = password_hash($password, PASSWORD_DEFAULT);
+
+            require 'Mailer.php';
+            $mailer = new Mailer();
             $token = generarToken();
-            if (!registraUsuario([$usuario, $pass_hash, $token, $id], $con)) {
+            $pass_hash = password_hash($password, PASSWORD_DEFAULT);
+
+            $idUsuario = registraUsuario([$usuario, $pass_hash, $token, $id], $con);
+            if ($idUsuario > 0) {
+
+                $url = SITE_URL . '/activa_cliente.php?id=' . $idUsuario . '&token=' . $token;
+                //http://localhost/Arena-para-gatos/activa_cliente.php?id=2&token=eb04b0053eda1b5957b3866227cd0ea6
+                $asunto = "Activar cuenta - Arena para Gatos";
+                $cuerpo = "Estimado $nombres: <br> Para continuar con el proceso de registro haga click 
+                en el siguiente enlace <a href='$url'>Activar cuenta</>";
+
+                if ($mailer->enviarEmail($email, $asunto, $cuerpo)) {
+                    echo "Estimado $nombres: <br> Para terminar el proceso de registro siga las instrucciones que le hemos enviado a la 
+                    dirección de correo electrónico $email";
+
+                    exit;
+                }
+            } else {
                 $errors[] = "Error al regitrar usuario";
             }
         } else {
@@ -150,7 +171,7 @@ if (!empty($_POST)) {
     <header>
         <nav class="fadeIn">
             <div class="img_brand">
-                <img src="img/logo2.png" alt="Logo de la tienda" width="150px">
+                <a href="index.php"><img src="img/logo2.png" alt="" width="150PX"></a>
             </div>
             <div class="nav_options">
                 <ul>
@@ -160,6 +181,11 @@ if (!empty($_POST)) {
                     <li><a href="politica_priv.php">POLÍTICA DE PRIVACIDAD</a></li>
                     <li><a href="terminos_condiciones.php">TÉRMINOS Y CONDICIONES</a></li>
                     <li><a href="checkout.php"><i class="fas fa-shopping-cart"></i> CARRITO <span id="num_cart"><?php echo $num_cart; ?></span></a></li>
+                    <?php if (isset($_SESSION['user_name'])) { ?>
+                        <li><a href="#"><i class="fas fa-user"></i> <span id="user_name"><?php echo $_SESSION['user_name']; ?></span></a></li>
+                    <?php } else { ?>
+                        <li><a href="login.php"><i class="fas fa-user"></i> LOGIN</a></li>
+                    <?php } ?>
                 </ul>
             </div>
         </nav>
@@ -174,35 +200,37 @@ if (!empty($_POST)) {
             <form class="row g-3" action="registro.php" method="post" autocomplete="off">
                 <div class="col-md-6">
                     <label for="nombres"><span class="text-danger">*</span>Nombres</label>
-                    <input type="text" name="nombres" id="nombres" class="form-control" requireda>
+                    <input type="text" name="nombres" id="nombres" class="form-control" required>
                 </div><br>
                 <div class="col-md-6">
                     <label for="apellidos"><span class="text-danger">*</span>Apellidos</label>
-                    <input type="text" name="apellidos" id="apellidos" class="form-control" requireda>
+                    <input type="text" name="apellidos" id="apellidos" class="form-control" required>
                 </div><br>
                 <div class="col-md-6">
                     <label for="email"><span class="text-danger">*</span>Correo electrónico</label>
-                    <input type="email" name="email" id="email" class="form-control" requireda>
+                    <input type="email" name="email" id="email" class="form-control" required>
+                    <span id="validaEmail" class="text-danger"></span>
                 </div><br>
                 <div class="col-md-6">
                     <label for="telefono"><span class="text-danger">*</span>Telefono</label>
-                    <input type="tel" name="telefono" id="telefono" class="form-control" requireda>
+                    <input type="tel" name="telefono" id="telefono" class="form-control" required>
                 </div><br>
                 <div class="col-md-6">
                     <label for="dni"><span class="text-danger">*</span>DNI</label>
-                    <input type="text" name="dni" id="dni" class="form-control" requireda>
+                    <input type="text" name="dni" id="dni" class="form-control" required>
                 </div><br>
                 <div class="col-md-6">
                     <label for="usuario"><span class="text-danger">*</span>Usuario</label>
-                    <input type="text" name="usuario" id="usuario" class="form-control" requireda>
+                    <input type="text" name="usuario" id="usuario" class="form-control" required>
+                    <span id="validaUsuario" class="text-danger"></span>
                 </div><br>
                 <div class="col-md-6">
                     <label for="password"><span class="text-danger">*</span>Contraseña</label>
-                    <input type="password" name="password" id="password" class="form-control" requireda>
+                    <input type="password" name="password" id="password" class="form-control" required>
                 </div><br>
                 <div class="col-md-6">
                     <label for="repassword"><span class="text-danger">*</span>Repetir Contraseña</label>
-                    <input type="password" name="repassword" id="repassword" class="form-control" requireda>
+                    <input type="password" name="repassword" id="repassword" class="form-control" required>
                 </div><br>
 
                 <i><b>Nota:</b> Los campos con astericos son obligatorios</i>
@@ -214,6 +242,62 @@ if (!empty($_POST)) {
 
         </div>
     </main>
+
+    <script>
+        let txtUsuario = document.getElementById('usuario')
+        txtUsuario.addEventListener("blur", function() {
+            existeUsuario(txtUsuario.value)
+        }, false)
+
+        let txtEmail = document.getElementById('email')
+        txtEmail.addEventListener("blur", function() {
+            emailExiste(txtEmail.value)
+        }, false)
+
+        function existeUsuario(usuario) {
+            let url = "clienteAjax.php"
+            let formData = new FormData()
+            formData.append("action", "existeUsuario")
+            formData.append("usuario", usuario)
+
+            fetch(url, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                .then(data => {
+
+                    if (data.ok) {
+                        document.getElementById('usuario').value = ''
+                        document.getElementById('validaUsuario').innerHTML = 'Usuario no disponible'
+                    } else {
+                        document.getElementById('validaUsuario').innerHTML = ''
+                    }
+
+                })
+        }
+
+        function emailExiste(email) {
+            let url = "clienteAjax.php"
+            let formData = new FormData()
+            formData.append("action", "emailExiste")
+            formData.append("email", email)
+
+            fetch(url, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                .then(data => {
+
+                    if (data.ok) {
+                        document.getElementById('email').value = ''
+                        document.getElementById('validaEmail').innerHTML = 'Correo electrónico no disponible'
+                    } else {
+                        document.getElementById('validaEmail').innerHTML = ''
+                    }
+
+                })
+        }
+    </script>
 
     <!-- Footer -->
     <footer>

@@ -13,16 +13,16 @@ $mail = new PHPMailer(true);
 try {
     // Configuración del servidor SMTP de Outlook
     $mail->isSMTP();
-    $mail->Host = 'smtp.office365.com';
+    $mail->Host = MAIL_HOST;
     $mail->SMTPAuth = true;
-    $mail->Username = 'arenaparagatos2@outlook.com'; // Tu dirección de correo de Outlook
-    $mail->Password = 'arenaparagatos.02'; // Tu contraseña de correo de Outlook
+    $mail->Username = MAIL_USER; // Tu dirección de correo de Outlook
+    $mail->Password = MAIL_PASS; // Tu contraseña de correo de Outlook
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
+    $mail->Port = MAIL_PORT;
 
     // Destinatarios
-    $mail->setFrom('arenaparagatos2@outlook.com', 'ARENA PARA GATOS');
-    $mail->addAddress('arenaparagatos2@outlook.com', 'Jonh Doe');
+    $mail->setFrom(MAIL_USER, 'ARENA PARA GATOS');
+    $mail->addAddress(MAIL_USER, 'Jonh Doe');
 
     // Contenido del correo
     $mail->isHTML(true);
