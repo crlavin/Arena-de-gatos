@@ -107,16 +107,21 @@ function activarUsuario($id, $con)
     return $sql->execute([$id]);
 }
 
-function login($usuario, $password, $con)
+function login($usuario, $password, $con, $proceso)
 {
-    $sql = $con->prepare("SELECT id, usuario, password FROM usuarios WHERE usuario LIKE ? LIMIT 1");
+    $sql = $con->prepare("SELECT id, usuario, password, id_cliente FROM usuarios WHERE usuario LIKE ? LIMIT 1");
     $sql->execute([$usuario]);
     if ($row = $sql->fetch(PDO::FETCH_ASSOC)) {
-        if(esActivo($usuario, $con)){
-            if(password_verify($password, $row['password'])){
+        if (esActivo($usuario, $con)) {
+            if (password_verify($password, $row['password'])) {
                 $_SESSION['user_id'] = $row['id'];
                 $_SESSION['user_name'] = $row['usuario'];
-                header("Location: index.php");
+                $_SESSION['user_cliente'] = $row['id_cliente'];
+                if ($proceso == 'pago') {
+                    header("Location: checkout.php");
+                } else {
+                    header("Location: index.php");
+                }
                 exit;
             }
         } else {
@@ -131,7 +136,38 @@ function esActivo($usuario, $con)
     $sql = $con->prepare("SELECT activacion FROM usuarios WHERE usuario LIKE ? LIMIT 1");
     $sql->execute([$usuario]);
     $row = $sql->fetch(PDO::FETCH_ASSOC);
-    if($row['activacion'] == 1){
+    if ($row['activacion'] == 1) {
+        return true;
+    }
+    return false;
+}
+
+function solicitaPassword($user_id, $con)
+{
+    $token = generarToken();
+
+    $sql = $con->prepare("UPDATE usuarios SET token_password=?, password_request=1 WHERE id = ?");
+    if ($sql->execute([$token, $user_id])) {
+        return $token;
+    }
+    return null;
+}
+
+function verificaTokenRequest($user_id, $token, $con)
+{
+    $sql = $con->prepare("SELECT id FROM usuarios WHERE id = ? AND token_password LIKE ? AND 
+    password_request=1 LIMIT 1");
+    $sql->execute([$user_id, $token]);
+    if ($sql->fetchColumn() > 0) {
+        return true;
+    }
+    return false;
+}
+
+function actualizaPassword($user_id, $password, $con)
+{
+    $sql = $con->prepare("UPDATE usuarios SET password=?, token_password = '', password_request=0 WHERE id = ?");
+    if ($sql->execute([$password, $user_id])) {
         return true;
     }
     return false;

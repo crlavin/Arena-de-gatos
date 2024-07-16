@@ -4,25 +4,45 @@ require 'config/database.php';
 require 'config/config.php';
 require 'clienteFunciones.php';
 
+$user_id = $_GET['id'] ?? $_POST['user_id'] ?? '';
+$token = $_GET['token'] ?? $_POST['token'] ?? '';
+
+if ($user_id == '' || $token == '') {
+    header("Location: index.php");
+    exit;
+}
 
 $errors = [];
 
 $db = new Database();
 $con = $db->conectar();
 
-$proceso = isset($_GET['pago']) ? 'pago' : 'login';
+if (!verificaTokenRequest($user_id, $token, $con)) {
+    echo "No se pudo verificar la información";
+    exit;
+}
 
 if (!empty($_POST)) {
-    $usuario = trim($_POST['usuario']);
-    $password = trim($_POST['password']);
-    $proceso = $_POST['proceso'] ?? 'login';
 
-    if (esNulo([$usuario, $password])) {
+    $password = trim($_POST['password']);
+    $repassword = trim($_POST['repassword']);
+
+    if (esNulo([$user_id, $token, $password, $repassword])) {
         $errors[] = "Debe llenar todos los campos";
     }
 
+    if (!validaPassword($password, $repassword)) {
+        $errors[] = "Las contraseñas no coinciden";
+    }
+
     if (count($errors) == 0) {
-        $errors[] = login($usuario, $password, $con, $proceso);
+        $pass_hash = password_hash($password, PASSWORD_DEFAULT);
+        if (actualizaPassword($user_id, $pass_hash, $con)) {
+            echo "Contraseña modificada.<br><a href='login.php'>Iniciar sesión</a>";
+            exit;
+        } else {
+            $errors[] = "Error al modificar la contraseña. Intentalo nuevamente.";
+        }
     }
 }
 ?>
@@ -99,11 +119,7 @@ if (!empty($_POST)) {
             bottom: 0;
         }
 
-        .form-login {
-            max-width: 350px;
-        }
-
-        button.realizar-login-btn {
+        button.realizar-recuperación-btn {
             background-color: #A0C3D2;
             color: white;
             font-size: 16px;
@@ -115,7 +131,7 @@ if (!empty($_POST)) {
             padding: 10px;
         }
 
-        button.realizar-login-btn:hover {
+        button.realizar-recuperación-btn:hover {
             background-color: #A0C3D2;
         }
 
@@ -150,7 +166,7 @@ if (!empty($_POST)) {
 
     <main class="container">
 
-        <h1>Inicia sesión</h1>
+        <h1>Cambiar Contraseña</h1>
 
         <?php if (!empty($errors)) : ?>
             <div class="error-messages">
@@ -162,27 +178,24 @@ if (!empty($_POST)) {
             </div>
         <?php endif; ?>
 
-        <form action="login.php" method="post" autocomplete="off">
+        <form action="reset_password.php" method="post" autocomplete="off">
 
-            <input type="hidden" name="proceso" value="<?php echo $proceso; ?>">
+            <input type="hidden" name="user_id" id="user_id" value="<?= $user_id; ?>" />
+            <input type="hidden" name="token" id="token" value="<?= $token; ?>" />
 
             <div class="form-group">
-                <label for="usuario">Usuario</label>
-                <input class="form-control" type=text name="usuario" id="usuario" placeholder="usuario" required>
-            </div><br>
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <input class="form-control" type=password name="password" id="password" placeholder="Contraseña" required>
+                <label for="password">Nueva Contraseña</label>
+                <input class="form-control" type=password name="password" id="password" placeholder="Nueva Contraseña" required>
             </div>
 
             <div class="form-group">
-                <a href="recupera.php">¿Olvidaste tu contraseña?</a>
+                <label for="repassword">Confirmar Contraseña</label>
+                <input class="form-control" type=password name="repassword" id="repassword" placeholder="Confirmar Contraseña" required>
             </div>
 
             <div>
-                <br><button type="submit" class="realizar-login-btn">Ingresar</button>
+                <br><button type="submit" class="realizar-recuperación-btn">Aceptar</button>
             </div>
-
             <hr>
 
             <div class="note">

@@ -10,19 +10,50 @@ $errors = [];
 $db = new Database();
 $con = $db->conectar();
 
-$proceso = isset($_GET['pago']) ? 'pago' : 'login';
-
 if (!empty($_POST)) {
-    $usuario = trim($_POST['usuario']);
-    $password = trim($_POST['password']);
-    $proceso = $_POST['proceso'] ?? 'login';
+    $email = trim($_POST['email']);
 
-    if (esNulo([$usuario, $password])) {
+    if (esNulo([$email])) {
         $errors[] = "Debe llenar todos los campos";
     }
 
+    if (esEmail([$email])) {
+        $errors[] = "La dirección de correo no es válida";
+    }
+
     if (count($errors) == 0) {
-        $errors[] = login($usuario, $password, $con, $proceso);
+        if (emailExiste($email, $con)) {
+            $sql = $con->prepare("SELECT usuarios.id, clientes.nombres FROM usuarios
+            INNER JOIN clientes ON usuarios.id_cliente=clientes.id
+             WHERE clientes.email LIKE ? LIMIT 1");
+            $sql->execute([$email]);
+            $row = $sql->fetch(PDO::FETCH_ASSOC);
+            $user_id = $row['id'];
+            $nombres = $row['nombres'];
+
+            $token = solicitaPassword($user_id, $con);
+
+            if ($token !== null) {
+                require 'Mailer.php';
+                $mailer = new Mailer();
+
+                $url = SITE_URL . '/reset_password.php?id=' . $user_id . '&token=' . $token;
+                $asunto = "Recuperar password - Arena para Gatos";
+                $cuerpo = "Estimado $nombres: <br> Si has solicitado el cambio de tu contraseña haga click 
+                en el siguiente enlace <a href='$url'>$url</a>.";
+                $cuerpo .= "<br> Si no realizaste esta petición puedes ignorar este correo.";
+
+                if ($mailer->enviarEmail($email, $asunto, $cuerpo)) {
+                    echo "<p><b>Correo enviado</b></p>";
+                    echo "<p>Hemos enviado un correo eletrónico a la dirección $email para restablecer la contraseña.
+                    </p>";
+
+                    exit;
+                }
+            }
+        } else {
+            $errors[] = "No existe una cuenta asociada a esta dirección de correo";
+        }
     }
 }
 ?>
@@ -99,11 +130,7 @@ if (!empty($_POST)) {
             bottom: 0;
         }
 
-        .form-login {
-            max-width: 350px;
-        }
-
-        button.realizar-login-btn {
+        button.realizar-recuperación-btn {
             background-color: #A0C3D2;
             color: white;
             font-size: 16px;
@@ -115,7 +142,7 @@ if (!empty($_POST)) {
             padding: 10px;
         }
 
-        button.realizar-login-btn:hover {
+        button.realizar-recuperación-btn:hover {
             background-color: #A0C3D2;
         }
 
@@ -150,7 +177,7 @@ if (!empty($_POST)) {
 
     <main class="container">
 
-        <h1>Inicia sesión</h1>
+        <h1>Recuperar Contraseña</h1>
 
         <?php if (!empty($errors)) : ?>
             <div class="error-messages">
@@ -162,27 +189,16 @@ if (!empty($_POST)) {
             </div>
         <?php endif; ?>
 
-        <form action="login.php" method="post" autocomplete="off">
-
-            <input type="hidden" name="proceso" value="<?php echo $proceso; ?>">
+        <form action="recupera.php" method="post" autocomplete="off">
 
             <div class="form-group">
-                <label for="usuario">Usuario</label>
-                <input class="form-control" type=text name="usuario" id="usuario" placeholder="usuario" required>
-            </div><br>
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <input class="form-control" type=password name="password" id="password" placeholder="Contraseña" required>
-            </div>
-
-            <div class="form-group">
-                <a href="recupera.php">¿Olvidaste tu contraseña?</a>
+                <label for="email">Correo electrónico</label>
+                <input class="form-control" type=email name="email" id="email" placeholder="Correo electrónico" required>
             </div>
 
             <div>
-                <br><button type="submit" class="realizar-login-btn">Ingresar</button>
+                <br><button type="submit" class="realizar-recuperación-btn">Aceptar</button>
             </div>
-
             <hr>
 
             <div class="note">
