@@ -80,4 +80,3 @@ if (is_array($datos)) {
 } else {
     echo 'Error: Datos recibidos no son un array<br>';
 }
-?>

@@ -6,7 +6,7 @@
     }
 
     .dropdown a {
-        background-color:#A0C3D2;
+        background-color: #A0C3D2;
         color: white;
         padding: 10px;
         cursor: pointer;
@@ -26,15 +26,15 @@
         position: absolute;
         min-width: 160px;
         z-index: 1;
-                
+
     }
 
     .dropdown-menu a {
         color: white;
         padding: 8px;
         text-decoration: none;
-        display: block;  
-        border: 1px solid white;      
+        display: block;
+        border: 1px solid white;
     }
 
     .dropdown-menu a:hover {
@@ -65,6 +65,7 @@
                     </a>
                     <div class="dropdown-menu" id="dropdown-menu">
                         <a class="dropdown-item" href="logout.php">Cerrar sesión</a>
+                        <a class="dropdown-item" href="compras.php">Mis compras</a>
                     </div>
                 </div>
             <?php } else { ?>
